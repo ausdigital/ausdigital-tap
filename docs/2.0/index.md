@@ -131,7 +131,7 @@ When a valid message is received, the TAP issues an HTTP 200 status and returns 
     "id": "tap-generated UUID of the message",
     "attributes": {
         "documentHash": "proxied field 'hash' from message.json document",
-        "deliveryStatus": "transit"
+        "deliveryStatus": "processing"
     }
   }
 }
