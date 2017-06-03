@@ -148,7 +148,7 @@ The TAP Protocol is a very simple REST API. One business sends a message directl
  * The sender uses the HTTP POST verb (over HTTPS) to send the signed message to a TAP,
  * The sender MUST use HTTPS,
  * The TAP MUST reply with received message info or error response,
- * The TAP MAY notarize some non-sensitive but useful data.
+ * The TAP MAY notarize messages that it receives (per `ausdigital-nry/1`).
 
 
 ## Receiving a business message
