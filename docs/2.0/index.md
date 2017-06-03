@@ -131,11 +131,20 @@ See the TAP Protocol Details chapter for more information.
 
 # TAP Protocol Details
 
-The TAP Protocol is a very simple REST API. One business sends a message directly to another business' TAP endpoint (discovered via the SMP):
+The TAP Protocol is a very simple REST API. One business sends a message directly to another business' TAP endpoint (discovered via the `ausdigital/DCP` protocol):
 
  * The sender uses the HTTP POST verb (over HTTPS) to send the signed message to a TAP.
  * The TAP replies with a HATEOS-style list of callback URLs.
  * The TAP notarises some non-sensitive but useful data to the blockchain.
+
+
+## Receiving a business message
+
+When a message is sent to a TAP endpoint (via HTTP `POST`), it MUST validate the message before delivering it to the recipient:
+
+ * If the sender participant identifier is not valid, the message MUST NOT be delivered.
+ * If the signing key for the message is not in the sender participant identifier's published list of signing keys (and non-revoked at the time of signing, per `ausdigital/DCP` protocol), the message MUST NOT be delivered.
+ * If the message signature is not made with the signing key of the message, the message MUST NOT be delivered.
 
 
 ## Sending a business message
