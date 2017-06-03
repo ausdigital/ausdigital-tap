@@ -143,12 +143,11 @@ See the TAP Protocol Details chapter for more information.
 # TAP Protocol Details
 
 
-The TAP Protocol is a very simple REST API. One business sends a message directly to another business' TAP endpoint (discovered via the `ausdigital/DCP` protocol):
+The TAP Protocol is a very simple REST API. One business sends a message directly to another business' TAP endpoint (discovered via the `ausdigital-dcp/1` protocol):
 
  * The sender uses the HTTP POST verb (over HTTPS) to send the signed message to a TAP,
  * The sender MUST use HTTPS,
  * The TAP MUST reply with received message info or error response,
- * The TAP MAY include a HATEOS-style list of callback URLs in the response,
  * The TAP MAY notarize some non-sensitive but useful data.
 
 
