@@ -93,10 +93,11 @@ document exchange.
 A TAP might be provided by a commercial ledger service, or maintained as part of an
 independent business system.
 
-The TAP specification has two parts. The main part (ausdigital-tap/2) defines the protocol all peers
-must follow (and interfaces they must provide) to send and receive business documents. The
-second part is an optional gateway specification (ausdigital-tapgw/1), which defines a client-server
-protocol for trusted business system components (e.g. ledger services) to interact with independent TAP service providers in a generic way.
+The TAP specification has two parts. The main part (ausdigital-tap/2) defines the protocol
+all peers must follow (and interfaces they must provide) to send and receive business
+documents. The second part is an optional gateway specification (ausdigital-tapgw/1), which
+defines a client-server protocol for trusted business system components (e.g. ledger
+services) to interact with independent TAP service providers in a generic way.
 
 
 ## Dependencies
@@ -115,25 +116,38 @@ All TAPs depend on the following Services:
 
 TAPGW providers also depend on the
 ausdigital-idp/1. TAPs do not need to
-authenticate when they interact with each other, due to use of well known cryprograpic keys
-and service endpoint addresses.
+authenticate when they interact with each other, due to use of well known cryprograpic
+keys and service endpoint addresses.
 
 
 ## TAP Protocol Overview
 
-In this protocol, a Transaction Access Point (TAP) is a business system component that sends and receives business messages. The TAP Protocol describes how one TAP sends the message, and how the other TAP responds when a message is received.
+In this protocol, a Transaction Access Point (TAP) is a business system component that
+sends and receives business messages. The TAP Protocol describes how one TAP sends the
+message, and how the other TAP responds when a message is received.
 
-The message is sent to the receiving TAP using HTTP POST operation, with a `Content-Type: multipart/form-data` body. This body contains two parts, `message` and `signature`.
+The message is sent to the receiving TAP using HTTP POST operation, with a
+`Content-Type: multipart/form-data` body. This body contains two parts, `message` and
+`signature`.
 
-The `message` part is a mixture of cleartext metadata (used by TAPs) and enciphered payload (used by trusted business system components). The cleartext metadata does not contain sensitive business information, whereas access to the business-sensitive information within the payload is not necessary for participating in the TAP protocol.
+The `message` part is a mixture of cleartext metadata (used by TAPs) and enciphered
+payload (used by trusted business system components). The cleartext metadata does not
+contain sensitive business information, whereas access to the business-sensitive
+information within the payload is not necessary for participating in the TAP protocol.
 
-The `signature` part is created by a business system component trusted by the sender (with access to the sender's private key material). The signature can be used as a unique identifier of the message contents (e.g. transmitted document id).
+The `signature` part is created by a business system component trusted by the sender
+(with access to the sender's private key material). The signature can be used as a
+unique identifier of the message contents (e.g. transmitted document id).
 
 ![Illustration of POST body](./tap_overview_post.png "Business document sent to TAP")
 
-Receiving TAPs may also use the signature as a filter (messages with invalid signatures MAY be dropped by receiving TAPs, rather than delivered). This allows TAPs to buffer trusted components from anonymous denial of service attacks.
+Receiving TAPs may also use the signature as a filter (messages with invalid
+signatures MAY be dropped by receiving TAPs, rather than delivered). This allows TAPs
+to buffer trusted components from anonymous denial of service attacks.
 
-When a valid message is received, the TAP issues an HTTP 200 status and returns a response body with `Content-Type: application/json`, containing received message information and optional HATEOS-style list of callback URLs.
+When a valid message is received, the TAP issues an HTTP 200 status and returns a
+response body with `Content-Type: application/json`, containing received message
+information and optional HATEOS-style list of callback URLs.
 
 ```
 {
@@ -154,7 +168,8 @@ See the TAP Protocol Details chapter for more information.
 # TAP Protocol Details
 
 
-The TAP Protocol is a very simple REST API. One business sends a message directly to another business' TAP endpoint (discovered via the `ausdigital-dcp/1` protocol):
+The TAP Protocol is a very simple REST API. One business sends a message directly
+to another business' TAP endpoint (discovered via the `ausdigital-dcp/1` protocol):
 
  * The sender uses the HTTP POST verb (over HTTPS) to send the signed message to a TAP,
  * The sender MUST use HTTPS,
@@ -164,7 +179,8 @@ The TAP Protocol is a very simple REST API. One business sends a message directl
 
 ## Receiving a business message
 
-When a message is sent to a TAP endpoint, it MUST validate the message before delivering it to the recipient:
+When a message is sent to a TAP endpoint, it MUST validate the message before
+delivering it to the recipient:
 
  * If the message does not validate against the JSON schema, return HTTP error (400).
  * If the sender participant identifier is not valid, an HTTP 200 may be returned but the message MUST NOT be delivered.
@@ -195,18 +211,30 @@ The process is:
 
 ### Sign the Business Document
 
-The TAP protocol MAY be used to transport any business message in any format. It MAY be used to transport messages compliant with Billing Semantics. Messages SHOULD be formatted as XML or JSON and UTF-8 encoded.
+The TAP protocol MAY be used to transport any business message in any format. It MAY
+be used to transport messages compliant with Billing Semantics. Messages SHOULD be
+formatted as XML or JSON and UTF-8 encoded.
 
-Message signing is interpreted in the sense used by the OpenPGP standard (RFC4880), however strict compliance would involve 3DES algorithm which is not supported. Approved signing algorithms are those determined `--safe` by the *modern* (Eliptic Curve Cryptography compatible) distribution of GnuPG. This is version 2.1.15 at the time of writing, but any stable release at or above v2.1.15 is appropriate.
+Message signing is interpreted in the sense used by the OpenPGP standard (RFC4880),
+however strict compliance would involve 3DES algorithm which is not supported.
+Approved signing algorithms are those determined `--safe` by the *modern* (Eliptic
+Curve Cryptography compatible) distribution of GnuPG. This is version 2.1.15 at the
+time of writing, but any stable release at or above v2.1.15 is appropriate.
 
 The following public key formats are supported:
 
  * ECC (RFC6637)
  * RSA (RFC4880)
 
-Business documents compression is discouraged, because it is redundant due to compression at the HTTP layer (per RFC2616 and RFC1952). Business documents MAY be compressed with ZIP (RFC1951), ZLIB (RFC1950), or BZip2 algorithms.
+Business documents compression is discouraged, because it is redundant due to
+compression at the HTTP layer (per RFC2616 and RFC1952). Business documents MAY be
+compressed with ZIP (RFC1951), ZLIB (RFC1950), or BZip2 algorithms.
 
-The business document and signature are combined into a single ASCII-Armoured file per RFC4880 (i.e. including use of Radix-64 to convert UTF-8 to 7 bit ASCII in the signed file). For example, assuming the current working directory contains a business document `doc.json`, a signed document `signed_doc.txt` can be created using the GnuPG command line program like this:
+The business document and signature are combined into a single ASCII-Armoured file
+per RFC4880 (i.e. including use of Radix-64 to convert UTF-8 to 7 bit ASCII in the
+signed file). For example, assuming the current working directory contains a business
+document `doc.json`, a signed document `signed_doc.txt` can be created using the
+GnuPG command line program like this:
 
 ```bash
 gpg2 \
@@ -229,31 +257,51 @@ The following hash algorithms are approved for use:
 
 It is not necessary to sign the hash, because the entire message is signed.
 
-This hash is of the cleartext "business document" before the signing. When the recipient decrypts the business document, they are able to verify the hash. If the recipient-generated hash does not match the hash in the message, the recipient MUST NOT provide business acceptance of the document.
+This hash is of the cleartext "business document" before the signing. When the
+recipient decrypts the business document, they are able to verify the hash. If the
+recipient-generated hash does not match the hash in the message, the recipient MUST
+NOT provide business acceptance of the document.
 
-The hash is calculated before the signing, so, if sender for some reasons calculates 2 different signatures using 2 different keys - the hash is still the same.
+The hash is calculated before the signing, so, if sender for some reasons calculates
+2 different signatures using 2 different keys - the hash is still the same.
 
 **TODO: this is a very strange paragraph.**
-If a 3rd party is presented with a copy of the message (including this hash), and with a copy of the signed business document, they are able to verify that the hash of the signed business document matches the hash in the message. That way, if the recipient provides business acceptance of the document, the third party knows the document that was accepted matches the cleartext document they were shown (despite the fact the 3rd party does not have access to recipient key material).
+If a 3rd party is presented with a copy of the message (including this hash), and
+with a copy of the signed business document, they are able to verify that the hash
+of the signed business document matches the hash in the message. That way, if the
+recipient provides business acceptance of the document, the third party knows the
+document that was accepted matches the cleartext document they were shown (despite
+the fact the 3rd party does not have access to recipient key material).
 
-Assuming the current working directory contains a document `doc.txt`, a hash of the signed document `doc.hash` can be created with openssl like this:
+Assuming the current working directory contains a document `doc.txt`, a hash of the
+signed document `doc.hash` can be created with openssl like this:
 
 ```bash
 openssl dgst -sha256 -out "doc.hash" "doc.txt"
 ```
 
-For example, if your doc.txt contains text `{"document_type": "invoice"}` (ending with newline character) the result is:
+For example, if your doc.txt contains text `{"document_type": "invoice"}` (ending
+with newline character) the result is:
+
 ```
 SHA256(doc.txt)= 14a62c86caa60bb3987248e93e51cacd46392562475738d3213b44f457ee163b
 ```
-where `14a62c86caa60bb3987248e93e51cacd46392562475738d3213b44f457ee163b` is a document hash in plan SHA256 HEX format.
+
+where `14a62c86caa60bb3987248e93e51cacd46392562475738d3213b44f457ee163b` is a
+document hash in plan SHA256 HEX format.
 
 
 ### Create cyphertext of signed business document
 
-The message does not contain plaintext of the business document (signed or otherwise). It contains the hash of the plaintext (as per above), and cyphertext of the signed plaintext document.
+The message does not contain plaintext of the business document (signed or otherwise).
+It contains the hash of the plaintext (as per above), and cyphertext of the signed
+plaintext document.
 
-The cyphertext is created using public key cryptography, using the appropriate public key for the recipient business endpoint. The public parts of these keypairs are discoverable using the appropriate DCP for each business identifier URNs, which is discoverable using the global DCL. Public keys MUST be published in ASCII-Armoured form in the DCP.
+The cyphertext is created using public key cryptography, using the appropriate public
+key for the recipient business endpoint. The public parts of these keypairs are
+discoverable using the appropriate DCP for each business identifier URNs, which is
+discoverable using the global DCL. Public keys MUST be published in ASCII-Armoured
+form in the DCP.
 
 Example:
 
@@ -271,22 +319,31 @@ Example:
    1. Only he decyphered the document
    2. This document has been signed by Alice.
 
-Use of mature, well-known and extensively scrutinised cryptography implementations is strongly encouraged. The following examples use GnuPG, although any compliant RFC4880 implementation could be used in an equivalent way.
+Use of mature, well-known and extensively scrutinised cryptography implementations is
+strongly encouraged. The following examples use GnuPG, although any compliant RFC4880
+implementation could be used in an equivalent way.
 
-Assuming the recipient's public key is not already in the sender's GnuPG keyring, but is in the current working directory as `recipient.gpg`, it can be added to the sender's GnuPG keyring like this:
+Assuming the recipient's public key is not already in the sender's GnuPG keyring, but
+is in the current working directory as `recipient.gpg`, it can be added to the sender's
+GnuPG keyring like this:
 
 ```bash
 gpg2 --import "recipient.gpg"
 ```
 
-With GnuPG, this is only necessary once. Subsequent messages to the same recipient can skip the key importing step.
+With GnuPG, this is only necessary once. Subsequent messages to the same recipient can
+skip the key importing step.
 
 
 #### Note about published keys
 
 Implementation-specific section.
 
-Once the recipient's key has been added to the sender's keyring, and assuming the current working directory contains a signed document `signed_doc.txt`, and the user namespace identifier of the recipient public key is `91f68ffafa1288ad55cb3e61e937870fb5598cc098e125fe29412ab3047f15e1@dcp.testpoint.io` then cyphertext of signed business document can be created with:
+Once the recipient's key has been added to the sender's keyring, and assuming the
+current working directory contains a signed document `signed_doc.txt`, and the user
+namespace identifier of the recipient public key is
+`91f68ffafa1288ad55cb3e61e937870fb5598cc098e125fe29412ab3047f15e1@dcp.testpoint.io`
+then cyphertext of signed business document can be created with:
 
 ```
 gpg2 --armour \
@@ -296,7 +353,9 @@ gpg2 --armour \
  signed_doc.txt
 ```
 
-This will create a file `cyphertext.gpg` in the current working directory, which has ASCII-Armour encoding (suitable for inclusion in a json document).
+This will create a file `cyphertext.gpg` in the current working directory, which
+has ASCII-Armour encoding (suitable for inclusion in a json document).
+
 
 ### Message format
 
@@ -318,11 +377,16 @@ Typical TAP message is:
   * sender must make his public keys, used for signing operations, available in the DCP
 * "reference" contains additional information about conversations or original message (which this one is replies to)
 
+
 ### Compose Message Example
 
-The `message` part is a mixture of cleartext metadata (used by TAPs) and enciphered payload (used by trusted business system components). The cleartext metadata does not contain sensitive business information, whereas access to the business-sensitive information within the payload is not necessary for participating in the TAP protocol.
+The `message` part is a mixture of cleartext metadata (used by TAPs) and enciphered
+payload (used by trusted business system components). The cleartext metadata does not
+contain sensitive business information, whereas access to the business-sensitive
+information within the payload is not necessary for participating in the TAP protocol.
 
-The message part does not need to be in any kind of canonical form. It MUST be a valid json document.
+The message part does not need to be in any kind of canonical form. It MUST be a
+valid json document.
 
 Assuming the current working directory contains:
 
@@ -331,7 +395,8 @@ Assuming the current working directory contains:
  * `reference.txt`, containing arbitrary string related to the document
  * `sender.txt`, containing the URN of the business identifier of the sender
 
-Then the following python script will create `message.json` file containing the cyphertext and associated metadata in json format.
+Then the following python script will create `message.json` file containing the
+cyphertext and associated metadata in json format.
 
 ```python
 import json
@@ -366,17 +431,23 @@ if __name__ == "__main__":
     compose_message()
 ```
 
+
 ### Generate signature
 
-The `signature` part is created by a business system component trusted by the sender (with access to the sender's private key material). The signature can also be used to uniquely identify the message contents.
+The `signature` part is created by a business system component trusted by the sender
+(with access to the sender's private key material). The signature can also be used to
+uniquely identify the message contents.
 
-Assuming the current working directory contains the message (as `message.json`), the following command will create a signature `message.sig`:
+Assuming the current working directory contains the message (as `message.json`), the
+following command will create a signature `message.sig`:
 
 ```bash
 gpg2 --output message.sig --sign message.json
 ```
 
-Implementation note: the easiest way to make sure that specific key is used for signature is to have only single private key in GPG keyring. GPG for linux support custom keyring location.
+Implementation note: the easiest way to make sure that specific key is used for
+signature is to have only single private key in GPG keyring. GPG for linux support
+custom keyring location.
 
 
 ### Posting the message to the recipient TAP
@@ -388,9 +459,13 @@ Layered on top of HTTP Protocol:
  * MAY explicitly declare `Content-Transfer-Encoding: base64`
  * MUST NOT rely on additional TAP-related information in HTTP headers, such as message or conversation identifiers.
 
-The message is sent to the receiving TAP using HTTP POST operation. The posted body contains two parts, named `message` and `signature`.
+The message is sent to the receiving TAP using HTTP POST operation. The posted body
+contains two parts, named `message` and `signature`.
 
-Assuming the current working directory contains the message (as message.json) and signature (as message.sig), the following curl command will post the message to the recipient TAP (replace `<TAP_URL>` with HTTPS URL discovered from the Service Metadata Publisher).
+Assuming the current working directory contains the message (as message.json) and
+signature (as message.sig), the following curl command will post the message to the
+recipient TAP (replace `<TAP_URL>` with HTTPS URL discovered from the Service
+Metadata Publisher).
 
 ```bash
 curl -X POST \
@@ -402,8 +477,11 @@ curl -X POST \
 
 ## Receipt and Technical Acknowledgement
 
-When a valid message is received, the TAP issues an HTTP 200 status and returns a response body with `Content-Type: application/json`, containing information about the message and optional HATEOS-style list of callback URLs.
-Check the [API](http://ausdigital.org/specs/ausdigital-tap/2.0/api)  for possible responses, success and errors.
+When a valid message is received, the TAP issues an HTTP 200 status and returns
+a response body with `Content-Type: application/json`, containing information
+about the message and optional HATEOS-style list of callback URLs.
+Check the [API](http://ausdigital.org/specs/ausdigital-tap/2.0/api) for possible
+responses, success and errors.
 
 TODO:
 
