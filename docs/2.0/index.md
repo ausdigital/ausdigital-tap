@@ -21,6 +21,7 @@ The primary goal of the Transaction Access Point (TAP) 2.0 Specification is to p
  * Enforced carrier neutrality; sender encrypts, recipient decrypts, intermediaries only have access to payload cyphertext (protect against weak permieter-security on complex gateway topologies)
  * Selectively transparent; enable 3rd information sharing protocols
  * Sufficient envelope data to allows 3rd parties to verify message cleartext and be aware of appropriately linked data.
+ * Support evidence of provonance and auditability without compromosing security
 
 
 The Transaction Access Point (TAP) 2.0 Specification defines:
@@ -265,14 +266,6 @@ NOT provide business acceptance of the document.
 The hash is calculated before the signing, so, if sender for some reasons calculates
 2 different signatures using 2 different keys - the hash is still the same.
 
-**TODO: this is a very strange paragraph.**
-If a 3rd party is presented with a copy of the message (including this hash), and
-with a copy of the signed business document, they are able to verify that the hash
-of the signed business document matches the hash in the message. That way, if the
-recipient provides business acceptance of the document, the third party knows the
-document that was accepted matches the cleartext document they were shown (despite
-the fact the 3rd party does not have access to recipient key material).
-
 Assuming the current working directory contains a document `doc.txt`, a hash of the
 signed document `doc.hash` can be created with openssl like this:
 
@@ -289,6 +282,40 @@ SHA256(doc.txt)= 14a62c86caa60bb3987248e93e51cacd46392562475738d3213b44f457ee163
 
 where `14a62c86caa60bb3987248e93e51cacd46392562475738d3213b44f457ee163b` is a
 document hash in plan SHA256 HEX format.
+
+
+#### Note about auditability
+
+The TAP interface is used to exchange encrypted messages, but they are wrapped
+in an envelope that contains cleartext which the TAP interface has access to.
+
+If a 3rd party is presented with a copy of the message (including the cleartext
+envelope), and with a copy of the signed business document, they are able to use
+the "hash of the signed business document" to verify that the cleartext document
+they have matches the contents of the cyphertext payload.
+
+This is true even though they are unable to decrypt the cyphertext, because they
+do not have access to the key material of the recipient.
+
+This means that if a 3rd party has access to the encrypted traffic, while they
+are unable to read the message payload, they are able to verify the contents of
+a message if someone shares the cleartext with them. It is not possible for a
+participant to make a false claim about the contents of messages.
+
+One example of a 3rd party who would benefit from this ability to verify encrypted
+payloads is a creditor providing an invoice factoring service. A borrower could
+provide their lender with cleartext invoices (and other documents in a BILL-SPEC
+conversation), and use the RESTRICT_LIST features of the `ausdigital-nry` to
+provide their lender with access to the enctypted messages. The lender could
+then confirm that the cleartext provided by the borrower matched the contents
+of the encrypted message payloads, even though they do not have the ability to
+decrypt them.
+
+Another example of an interested 3rd party would be a value-adding reseller who
+want's to prove the provonance of supply. They could do this by providing access
+to messages (either with `ausdigital-nry` RESTRICT_LIST, or some other publishing
+mechanism) as well as cleartext. Cleartext and messages could be passed down the
+supply chain to prove provonance from source, and document value adding steps.
 
 
 ### Create cyphertext of signed business document
