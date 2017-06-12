@@ -392,17 +392,29 @@ Typical TAP message is:
     "cyphertext": "string",
     "hash": "string",
     "sender": "string",
+    "initiator": "string",
+    "responder": "string",
     "reference": "string"
 }
 ```
 
-* "cyphertext" contains encrypted signed document
-* encrypted by receiver public key
-* signed by sender private key
-* "hash" contains cryptographic hash of the document (before signing and encryption)
-* "sender" contains unique participant identifier of client
-  * sender must make his public keys, used for signing operations, available in the DCP
-* "reference" contains additional information about conversations or original message (which this one is replies to)
+ * "cyphertext" contains encrypted signed document
+ * encrypted by receiver public key
+ * signed by sender private key
+ * "hash" contains cryptographic hash of the document (before signing and encryption)
+ * "sender" contains unique participant identifier of client
+ * sender must make his public keys, used for signing operations, available in the DCP
+ * together "initiator" and "reference" form a candidate conversation identifier
+ * initiator is the sender of the first message in a conversation
+ * "responder" is the recipient of the first message in the conversation
+ * all but the first message in a conversation must have a "responder"
+ * "reference" is an identifier chosen by the initiator (e.g. "invoice-1234567")
+ * the initiator must not reuse references, they are locally unique
+
+While the combination of "initiator" and "refernce" are a minimal candidate identifier
+for the conversation, the conversation identifier is all three values together. Thus
+each conversation has two valid identifiers (the first message with a null responder,
+and all subsequent messages which have a non-null responder).
 
 
 ### Compose Message Example
