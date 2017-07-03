@@ -90,7 +90,7 @@ See the complete [Access Point Implementation Guide](./Access_Point_Implementati
 
 # Related Material
 
- * AusDigital Transaction Access Point Implementation Guide (v1.0, available [here](https://github.com/ausdigital/ausdigital-tap/blob/master/docs/1.0/Digital_Capability_Publisher_Implementation_Guide_v1.0.pdf)), which provides background to the [AusDigital](http://ausdigital.org) community process.
+ * AusDigital Transaction Access Point Implementation Guide (v1.0, available [here](https://github.com/ausdigital/ausdigital-tap/blob/master/docs/1.0/Access_Point_Implementation_Guide_v1.0.pdf)), which provides background to the [AusDigital](http://ausdigital.org) community process.
  * [GitHub issues](https://github.com/ausdigital/ausdigital-tap/issues/) for collaborating on the development of the TAP.
  * A reference [TAP service](http://testpoint.io/tap) (for testing and development purposes).
  * Free, Open-Source Software [TAP implementation](https://github.com/test-point/testpoint-tap).
