@@ -401,14 +401,16 @@ has ASCII-Armour encoding (suitable for inclusion in a json document).
 ### Message format
 
 Typical TAP message is:
+
 ```
 {
-    "cyphertext": "string",
-    "hash": "string",
-    "sender": "string",
-    "initiator": "string",
-    "responder": "string",
-    "reference": "string"
+  "cyphertext": "string",
+  "hash": "string",
+  "sender": "string",
+  "initiator": "string",
+  "responder": "string",
+  "reference": "string",
+  "callbackURLs": ["string"]
 }
 ```
 
@@ -424,6 +426,7 @@ Typical TAP message is:
  * all but the first message in a conversation must have a "responder"
  * "reference" is an identifier chosen by the initiator (e.g. "invoice-1234567")
  * the initiator must not reuse references, they are locally unique
+ * "callbackURLs" are optional and requires if sender opts to receive technical callbacks
 
 While the combination of "initiator" and "refernce" are a minimal candidate identifier
 for the conversation, the conversation identifier is all three values together. Thus
@@ -533,7 +536,7 @@ curl -X POST \
 When a valid message is received, the TAP issues an HTTP 200 status and returns
 a response body with `Content-Type: application/json`, containing information
 about the message and optional HATEOS-style list of callback URLs.
-Check the [API](http://ausdigital.org/specs/ausdigital-tap/2.0/api) for possible
+Check the [API](http://swagger.testpoint.io/?url=http://ausdigital.org/specs/ausdigital-tap/2.0/swagger.json){:target="_blank"} for possible
 responses, success and errors.
 
 TODO:
