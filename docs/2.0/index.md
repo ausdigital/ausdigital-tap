@@ -536,7 +536,7 @@ curl -X POST \
 When a valid message is received, the TAP issues an HTTP 200 status and returns
 a response body with `Content-Type: application/json`, containing information
 about the message and optional HATEOS-style list of callback URLs.
-Check the [API](http://swagger.testpoint.io/?url=http://ausdigital.org/specs/ausdigital-tap/2.0/swagger.json){:target="_blank"} for possible
+Check the [API](http://swagger.testpoint.io/?url=http://ausdigital.org/specs/ausdigital-tap/2.0/swagger.yaml){:target="_blank"} for possible
 responses, success and errors.
 
 TODO:
